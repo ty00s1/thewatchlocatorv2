@@ -1,0 +1,56 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./seed/dump.sql:/docker-entrypoint-initdb.d/01-dump.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uwordpress", "-pwordpress"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  wordpress:
+    build:
+      context: ./wordpress
+    ports:
+      - "8081:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WP_PUBLIC_URL: http://localhost:8081
+      FRONTEND_ORIGIN: http://localhost:3001
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wordpress/headless-shim:/var/www/html/wp-content/themes/headless-shim
+      - ./seed/uploads-backup:/seed/uploads:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: production
+      WP_API_URL: http://wordpress
+      NEXT_PUBLIC_WP_URL: http://localhost:8081
+      FRONTEND_ORIGIN: http://localhost:3001
+    depends_on:
+      - wordpress
+    restart: unless-stopped
+
+volumes:
+  wordpress_data:
+  db_data:

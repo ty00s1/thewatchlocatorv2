@@ -1,0 +1,14 @@
+.env
+.DS_Store
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+*.log
+
+# Stray screenshots / paste artefacts in the project root
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+/Backup.zip

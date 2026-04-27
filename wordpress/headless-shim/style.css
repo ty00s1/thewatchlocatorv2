@@ -1,0 +1,7 @@
+/*
+Theme Name: Headless Shim
+Theme URI: https://thewatchlocator.local
+Description: Minimal theme for a headless WordPress install. The Next.js frontend owns rendering — this theme only registers CPTs, opens CORS, and 404s direct frontend visits.
+Version: 1.0.0
+Author: The Watch Locator
+*/
